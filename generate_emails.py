@@ -89,10 +89,10 @@ def write_to_file(filename, emails):
         for email in emails:
             f.write(f"{email}\n")
 
-def send_to_discord(emails, webhook_url):
+def send_to_discord(gmail_emails, outlook_emails, webhook_url):
     apobj = apprise.Apprise()
     apobj.add(webhook_url)
-    message = "\n".join(emails)
+    message = "**Gmail Emails:**\n" + "\n".join(gmail_emails) + "\n\n**Outlook Emails:**\n" + "\n".join(outlook_emails)
     apobj.notify(body=message, title="Generated Emails")
 
 def main():
@@ -112,9 +112,8 @@ def main():
         outlook_emails = generate_emails(email_config['outlook'], name_types, add_numbers, control_config['outlook']['count'], control_config['outlook']['plus'], control_config['outlook']['dot'], "outlook.com")
         write_to_file("outlook_emails.txt", outlook_emails)
 
-    all_emails = gmail_emails + outlook_emails
     discord_webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
-    send_to_discord(all_emails, discord_webhook_url)
+    send_to_discord(gmail_emails, outlook_emails, discord_webhook_url)
 
 if __name__ == "__main__":
     main()
