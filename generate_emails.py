@@ -19,12 +19,13 @@ def generate_name(name_types):
         fake = Faker('en_US')
         return fake.first_name().lower()
     if name_types['personal_given_names']['japanese']:
-        fake = Faker('ja_JP')
+        fake = Faker('en_US')
         return fake.first_name().lower()
     if name_types['personal_given_names']['chinese']:
-        fake = Faker('zh_CN')
+        fake = Faker('en_US')
         return fake.first_name().lower()
     if name_types['personal_given_names']['other']:
+        fake = Faker('en_US')
         return fake.first_name().lower()
     if name_types['surnames']:
         return fake.last_name().lower()
