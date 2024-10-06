@@ -1,5 +1,10 @@
 name_types:
-  personal_given_names: true
+  personal_given_names:
+    indian: false
+    western: true
+    japanese: false
+    chinese: false
+    other: false
   surnames: false
   nicknames: false
   brand_names: false
