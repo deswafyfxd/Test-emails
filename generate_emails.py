@@ -16,6 +16,9 @@ def write_to_file(filename, emails):
             f.write(f"{email}\n")
 
 def send_to_discord(emails, webhook_url):
+    if not webhook_url.startswith("http"):
+        print("Invalid webhook URL: No scheme supplied")
+        return
     data = {"content": "\n".join(emails)}
     response = requests.post(webhook_url, json=data)
     if response.status_code != 204:
