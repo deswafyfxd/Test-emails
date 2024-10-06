@@ -1,0 +1,10 @@
+name_types:
+  personal_given_names: true
+  surnames: false
+  nicknames: false
+  brand_names: false
+  place_names: false
+  pen_names: false
+  stage_names: false
+  usernames: false
+  scientific_names: false
