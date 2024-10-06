@@ -45,16 +45,18 @@ def generate_name(name_types):
         return f"species_{fake.word()}".lower()
     return fake.first_name().lower()  # Default to personal names if all false
 
-def generate_emails(base_email, name_types, add_numbers, count=10):
+def generate_emails(base_email, name_types, add_numbers, count=10, plus=True, dot=False):
     username, domain = base_email.split('@')
     emails = []
     for _ in range(count):
         name = generate_name(name_types)
         if add_numbers['enabled']:
             number_suffix = ''.join(random.choices(string.digits, k=add_numbers['digits']))
-            emails.append(f"{username}+{name}{number_suffix}@{domain}")
-        else:
+            name += number_suffix
+        if plus:
             emails.append(f"{username}+{name}@{domain}")
+        elif dot:
+            emails.append(f"{username}.{name}@{domain}")
     return emails
 
 def write_to_file(filename, emails):
@@ -81,11 +83,11 @@ def main():
     outlook_emails = []
 
     if control_config['gmail']['enabled']:
-        gmail_emails = generate_emails(email_config['gmail'], name_types, add_numbers, control_config['gmail']['count'])
+        gmail_emails = generate_emails(email_config['gmail'], name_types, add_numbers, control_config['gmail']['count'], control_config['gmail']['plus'], control_config['gmail']['dot'])
         write_to_file("gmail_emails.txt", gmail_emails)
 
     if control_config['outlook']['enabled']:
-        outlook_emails = generate_emails(email_config['outlook'], name_types, add_numbers, control_config['outlook']['count'])
+        outlook_emails = generate_emails(email_config['outlook'], name_types, add_numbers, control_config['outlook']['count'], control_config['outlook']['plus'], control_config['outlook']['dot'])
         write_to_file("outlook_emails.txt", outlook_emails)
 
     all_emails = gmail_emails + outlook_emails
