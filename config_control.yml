@@ -2,7 +2,7 @@ gmail:
   enabled: true
   count: 10
   plus: true
-  dot_variation: true
+  dot_variation: false
   plus_dot_combination: true  # Mix of both
 
 outlook:
