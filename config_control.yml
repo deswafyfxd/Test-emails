@@ -1,0 +1,7 @@
+gmail:
+  enabled: true
+  count: 10
+
+outlook:
+  enabled: true
+  count: 5
