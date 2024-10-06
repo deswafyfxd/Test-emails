@@ -1,7 +1,11 @@
 gmail:
   enabled: true
   count: 10
+  plus: true
+  dot: false
 
 outlook:
   enabled: true
   count: 5
+  plus: false
+  dot: true
