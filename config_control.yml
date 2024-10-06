@@ -1,12 +1,19 @@
 gmail:
-  enabled: true
-  count: 10
-  plus: true
-  dot_variation: false
-  plus_dot_combination: false  # Mix of both
+  enabled: true  # Enable or disable Gmail email generation
+  count: 15  # Total number of Gmail emails to generate
+  plus: true  # Use "+" in Gmail email addresses
+  plus_count: 5  # Number of Gmail emails with "+"
+  dot_variation: true  # Use dot variations in Gmail email addresses
+  dot_variation_count: 5  # Number of Gmail emails with dot variations
+  plus_dot_combination: true  # Use both "+" and dot variations in Gmail email addresses
+  plus_dot_combination_count: 5  # Number of Gmail emails with both "+" and dot variations
 
 outlook:
-  enabled: true
-  count: 5
-  plus: true
-  dot: false  # Ensure Outlook does not use dots
+  enabled: true  # Enable or disable Outlook email generation
+  count: 15  # Total number of Outlook emails to generate
+  plus: true  # Use "+" in Outlook email addresses
+  plus_count: 7  # Number of Outlook emails with "+"
+  dot_variation: false  # Outlook does not support dot variations
+  dot_variation_count: 0  # No Outlook emails with dot variations
+  plus_dot_combination: false  # Outlook does not support both "+" and dot variations
+  plus_dot_combination_count: 0  # No Outlook emails with both "+" and dot variations
