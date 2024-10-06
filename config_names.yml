@@ -13,3 +13,7 @@ name_types:
   stage_names: false
   usernames: false
   scientific_names: false
+
+add_numbers:
+  enabled: true
+  digits: 2
