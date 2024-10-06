@@ -2,12 +2,17 @@ import random
 import string
 import requests
 import os
+import yaml
+from faker import Faker
 
-def generate_random_string(length=5):
-    return ''.join(random.choices(string.ascii_lowercase, k=length))
+fake = Faker()
+
+def load_config(file_path):
+    with open(file_path, 'r') as file:
+        return yaml.safe_load(file)
 
 def generate_emails(base_email, domain, count=10):
-    emails = [f"{base_email}+{generate_random_string()}@{domain}" for _ in range(count)]
+    emails = [f"{base_email}+{fake.first_name().lower()}@{domain}" for _ in range(count)]
     return emails
 
 def write_to_file(filename, emails):
@@ -24,19 +29,19 @@ def send_to_discord(emails, webhook_url):
     if response.status_code != 204:
         print(f"Failed to send emails to Discord: {response.status_code}")
 
-def main(generate_gmail=True, generate_outlook=True):
-    gmail_base = "kishorkumar@gmail.com"
-    outlook_base = "kishorkumar@outlook.com"
+def main():
+    control_config = load_config('config_control.yml')
+    email_config = load_config('config_emails.yml')
 
     gmail_emails = []
     outlook_emails = []
 
-    if generate_gmail:
-        gmail_emails = generate_emails(gmail_base, "gmail.com")
+    if control_config['gmail']['enabled']:
+        gmail_emails = generate_emails(email_config['gmail'], "gmail.com", control_config['gmail']['count'])
         write_to_file("gmail_emails.txt", gmail_emails)
 
-    if generate_outlook:
-        outlook_emails = generate_emails(outlook_base, "outlook.com")
+    if control_config['outlook']['enabled']:
+        outlook_emails = generate_emails(email_config['outlook'], "outlook.com", control_config['outlook']['count'])
         write_to_file("outlook_emails.txt", outlook_emails)
 
     all_emails = gmail_emails + outlook_emails
@@ -44,4 +49,4 @@ def main(generate_gmail=True, generate_outlook=True):
     send_to_discord(all_emails, discord_webhook_url)
 
 if __name__ == "__main__":
-    main(generate_gmail=True, generate_outlook=True)
+    main()
