@@ -2,10 +2,11 @@ gmail:
   enabled: true
   count: 10
   plus: true
-  dot: false
+  dot_variation: true
+  plus_dot_combination: true  # Mix of both
 
 outlook:
   enabled: true
   count: 5
-  plus: false
-  dot: true
+  plus: true
+  dot: false  # Ensure Outlook does not use dots
