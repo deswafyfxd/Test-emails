@@ -11,8 +11,9 @@ def load_config(file_path):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
 
-def generate_emails(base_email, domain, count=10):
-    emails = [f"{base_email}+{fake.first_name().lower()}@{domain}" for _ in range(count)]
+def generate_emails(base_email, count=10):
+    username, domain = base_email.split('@')
+    emails = [f"{username}+{fake.first_name().lower()}@{domain}" for _ in range(count)]
     return emails
 
 def write_to_file(filename, emails):
@@ -37,11 +38,11 @@ def main():
     outlook_emails = []
 
     if control_config['gmail']['enabled']:
-        gmail_emails = generate_emails(email_config['gmail'], "gmail.com", control_config['gmail']['count'])
+        gmail_emails = generate_emails(email_config['gmail'], control_config['gmail']['count'])
         write_to_file("gmail_emails.txt", gmail_emails)
 
     if control_config['outlook']['enabled']:
-        outlook_emails = generate_emails(email_config['outlook'], "outlook.com", control_config['outlook']['count'])
+        outlook_emails = generate_emails(email_config['outlook'], control_config['outlook']['count'])
         write_to_file("outlook_emails.txt", outlook_emails)
 
     all_emails = gmail_emails + outlook_emails
