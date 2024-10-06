@@ -1,5 +1,7 @@
 import random
 import string
+import requests
+import os
 
 def generate_random_string(length=5):
     return ''.join(random.choices(string.ascii_lowercase, k=length))
@@ -14,7 +16,6 @@ def write_to_file(filename, emails):
             f.write(f"{email}\n")
 
 def send_to_discord(emails, webhook_url):
-    import requests
     data = {"content": "\n".join(emails)}
     response = requests.post(webhook_url, json=data)
     if response.status_code != 204:
@@ -36,7 +37,7 @@ def main(generate_gmail=True, generate_outlook=True):
         write_to_file("outlook_emails.txt", outlook_emails)
 
     all_emails = gmail_emails + outlook_emails
-    discord_webhook_url = "YOUR_DISCORD_WEBHOOK_URL"
+    discord_webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
     send_to_discord(all_emails, discord_webhook_url)
 
 if __name__ == "__main__":
