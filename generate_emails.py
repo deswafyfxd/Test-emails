@@ -12,12 +12,23 @@ def load_config(file_path):
         return yaml.safe_load(file)
 
 def generate_name(name_types):
-    if name_types['personal_given_names']:
+    if name_types['personal_given_names']['indian']:
+        fake = Faker('en_IN')
+        return fake.first_name().lower()
+    if name_types['personal_given_names']['western']:
+        fake = Faker('en_US')
+        return fake.first_name().lower()
+    if name_types['personal_given_names']['japanese']:
+        fake = Faker('ja_JP')
+        return fake.first_name().lower()
+    if name_types['personal_given_names']['chinese']:
+        fake = Faker('zh_CN')
+        return fake.first_name().lower()
+    if name_types['personal_given_names']['other']:
         return fake.first_name().lower()
     if name_types['surnames']:
         return fake.last_name().lower()
     if name_types['nicknames']:
-        # Faker does not have direct nicknames; could use first names as a proxy
         return fake.first_name().lower()
     if name_types['brand_names']:
         return fake.company().lower().replace(' ', '')
@@ -30,7 +41,6 @@ def generate_name(name_types):
     if name_types['usernames']:
         return fake.user_name().lower()
     if name_types['scientific_names']:
-        # Faker does not have scientific names; creating a placeholder
         return f"species_{fake.word()}".lower()
     return fake.first_name().lower()  # Default to personal names if all false
 
