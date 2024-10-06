@@ -56,33 +56,37 @@ def generate_dot_variations(username):
                 variations.add(variation)
     return variations
 
-def generate_emails(base_email, name_types, add_numbers, count=10, plus=True, dot=False, plus_dot_combination=False, domain=""):
+def generate_emails(base_email, name_types, add_numbers, total_count=10, plus_count=0, dot_variation_count=0, plus_dot_combination_count=0, domain="", plus_enabled=True, dot_enabled=True, plus_dot_combination_enabled=True):
     username, domain = base_email.split('@')
     emails = set()
-    
-    while len(emails) < count:
+
+    # Fallback to plus type if all counts are 0
+    if total_count > 10 and plus_count == 0 and dot_variation_count == 0 and plus_dot_combination_count == 0:
+        plus_count = total_count
+
+    while len(emails) < total_count:
         name = generate_name(name_types)
         if add_numbers['enabled']:
             number_suffix = ''.join(random.choices(string.digits, k=add_numbers['digits']))
             name += number_suffix
-        
+
         if domain == "gmail.com":
-            if plus_dot_combination and len(emails) < count // 2:
+            if plus_dot_combination_enabled and plus_dot_combination_count > 0 and len(emails) < plus_dot_combination_count:
                 dot_variations = generate_dot_variations(username)
                 for variation in dot_variations:
                     emails.add(f"{variation}+{name}@{domain}")
-            elif plus:
+            elif plus_enabled and plus_count > 0 and len(emails) < plus_count + plus_dot_combination_count:
                 emails.add(f"{username}+{name}@{domain}")
-            elif dot:
+            elif dot_enabled and dot_variation_count > 0:
                 dot_variations = generate_dot_variations(username)
                 for variation in dot_variations:
                     emails.add(f"{variation}@{domain}")
-        elif domain == "outlook.com" and dot:
+        elif domain == "outlook.com" and dot_enabled:
             print("Error: Outlook does not support dots. Skipping dot-based email generation.")
         else:
             emails.add(f"{username}+{name}@{domain}")
-    
-    return list(emails)[:count]
+
+    return list(emails)[:total_count]
 
 def write_to_file(filename, emails):
     with open(filename, 'w') as f:
@@ -104,12 +108,40 @@ def main():
     gmail_emails = []
     outlook_emails = []
 
+    gmail_total_count = control_config['gmail']['count']
+    outlook_total_count = control_config['outlook']['count']
+
+    gmail_plus_count = control_config['gmail'].get('plus_count', 0)
+    gmail_dot_variation_count = control_config['gmail'].get('dot_variation_count', 0)
+    gmail_plus_dot_combination_count = control_config['gmail'].get('plus_dot_combination_count', 0)
+    gmail_plus_enabled = control_config['gmail'].get('plus', False)
+    gmail_dot_variation_enabled = control_config['gmail'].get('dot_variation', False)
+    gmail_plus_dot_combination_enabled = control_config['gmail'].get('plus_dot_combination', False)
+
+    outlook_plus_count = control_config['outlook'].get('plus_count', 0)
+    outlook_dot_variation_count = control_config['outlook'].get('dot_variation_count', 0)
+    outlook_plus_dot_combination_count = 0  # Outlook does not support dots
+    outlook_plus_enabled = control_config['outlook'].get('plus', False)
+    outlook_dot_variation_enabled = control_config['outlook'].get('dot_variation', False)
+    outlook_plus_dot_combination_enabled = control_config['outlook'].get('plus_dot_combination', False)
+
+    # Default to plus if total count is 10 or below
+    if gmail_total_count <= 10:
+        gmail_plus_count = gmail_total_count
+        gmail_dot_variation_count = 0
+        gmail_plus_dot_combination_count = 0
+
+    if outlook_total_count <= 10:
+        outlook_plus_count = outlook_total_count
+        outlook_dot_variation_count = 0
+        outlook_plus_dot_combination_count = 0
+
     if control_config['gmail']['enabled']:
-        gmail_emails = generate_emails(email_config['gmail'], name_types, add_numbers, control_config['gmail']['count'], control_config['gmail']['plus'], control_config['gmail']['dot_variation'], control_config['gmail']['plus_dot_combination'], "gmail.com")
+        gmail_emails = generate_emails(email_config['gmail'], name_types, add_numbers, gmail_total_count, gmail_plus_count, gmail_dot_variation_count, gmail_plus_dot_combination_count, "gmail.com", gmail_plus_enabled, gmail_dot_variation_enabled, gmail_plus_dot_combination_enabled)
         write_to_file("gmail_emails.txt", gmail_emails)
 
     if control_config['outlook']['enabled']:
-        outlook_emails = generate_emails(email_config['outlook'], name_types, add_numbers, control_config['outlook']['count'], control_config['outlook']['plus'], control_config['outlook']['dot'], "outlook.com")
+        outlook_emails = generate_emails(email_config['outlook'], name_types, add_numbers, outlook_total_count, outlook_plus_count, outlook_dot_variation_count, outlook_plus_dot_combination_count, "outlook.com", outlook_plus_enabled, outlook_dot_variation_enabled, outlook_plus_dot_combination_enabled)
         write_to_file("outlook_emails.txt", outlook_emails)
 
     discord_webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
