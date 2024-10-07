@@ -112,7 +112,7 @@ def send_to_discord(gmail_emails, outlook_emails, webhook_url):
     message = (
         f"**Date and Time:** {timestamp}\n\n"
         "**Gmail Emails:**\n"
-        "**Plus and Plus Dot Combination:**\n" + "\n".join(gmail_plus) + "\n" + "\n".join(gmail_plus_dot) + "\n\n"
+        "**Plus and Plus Dot Combination:**\n" + "\n".join(gmail_plus) + "\n\n" + "\n".join(gmail_plus_dot) + "\n\n"
         "**Dot Variation:**\n" + "\n".join(gmail_dot) + "\n\n"
         "**Outlook Emails:**\n"
         "**Plus:**\n" + "\n".join(outlook_plus)
