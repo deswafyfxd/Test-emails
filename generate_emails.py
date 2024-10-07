@@ -46,45 +46,34 @@ def generate_name(name_types):
     return fake.first_name().lower()  # Default to personal names if all false
 
 def generate_dot_variations(username):
-    positions = range(len(username))
     variations = set()
-
-    for i in positions:
-        variation = username[:i] + '.' + username[i:]
-        variations.add(variation)
+    for i in range(1, len(username)):
+        variations.add(username[:i] + '.' + username[i:])
     return variations
 
 def generate_emails(base_email, name_types, add_numbers, total_count=10, plus_count=0, dot_variation_count=0, plus_dot_combination_count=0, domain="", plus_enabled=True, dot_enabled=True, plus_dot_combination_enabled=True):
     username, domain = base_email.split('@')
-    emails = set()
+    emails = []
 
     # Fallback to plus type if all counts are 0
     if total_count > 10 and plus_count == 0 and dot_variation_count == 0 and plus_dot_combination_count == 0:
         plus_count = total_count
 
-    while len(emails) < total_count:
-        name = generate_name(name_types)
-        if add_numbers['enabled']:
-            number_suffix = ''.join(random.choices(string.digits, k=add_numbers['digits']))
-            name += number_suffix
-
-        if domain == "gmail.com":
-            if plus_dot_combination_enabled and plus_dot_combination_count > 0 and len(emails) < plus_dot_combination_count:
-                dot_variations = generate_dot_variations(username)
-                for variation in dot_variations:
-                    emails.add(f"{variation}+{name}@{domain}")
-            elif plus_enabled and plus_count > 0 and len(emails) < plus_count + plus_dot_combination_count:
-                emails.add(f"{username}+{name}@{domain}")
-            elif dot_enabled and dot_variation_count > 0:
-                dot_variations = generate_dot_variations(username)
-                for variation in dot_variations:
-                    emails.add(f"{variation}@{domain}")
-        elif domain == "outlook.com" and dot_enabled:
-            print("Error: Outlook does not support dots. Skipping dot-based email generation.")
-        else:
-            emails.add(f"{username}+{name}@{domain}")
-
-    return list(emails)[:total_count]
+    for _ in range(plus_dot_combination_count):
+        if len(emails) < total_count and plus_dot_combination_enabled:
+            variation = generate_dot_variations(username)
+            emails.append(next(iter(variation)) + '+' + generate_name(name_types) + '@' + domain)
+    
+    for _ in range(plus_count):
+        if len(emails) < total_count and plus_enabled:
+            emails.append(username + '+' + generate_name(name_types) + '@' + domain)
+    
+    for _ in range(dot_variation_count):
+        if len(emails) < total_count and dot_enabled:
+            variation = generate_dot_variations(username)
+            emails.append(next(iter(variation)) + '@' + domain)
+    
+    return emails
 
 def write_to_file(filename, emails):
     with open(filename, 'w') as f:
@@ -94,22 +83,22 @@ def write_to_file(filename, emails):
 def send_to_discord(gmail_emails, outlook_emails, webhook_url):
     apobj = apprise.Apprise()
     apobj.add(webhook_url)
+
+    gmail_plus = [email for email in gmail_emails if "+" in email and "." not in email]
+    gmail_dot = [email for email in gmail_emails if "." in email and "+" not in email]
+    gmail_plus_dot = [email for email in gmail_emails if "+" in email and "." in email]
     
-    gmail_plus = "\n".join([email for email in gmail_emails if "+" in email and "." not in email])
-    gmail_dot = "\n".join([email for email in gmail_emails if "." in email and "+" not in email])
-    gmail_plus_dot = "\n".join([email for email in gmail_emails if "+" in email and "." in email])
-    
-    outlook_plus = "\n".join([email for email in outlook_emails if "+" in email])
-    
+    outlook_plus = [email for email in outlook_emails if "+" in email]
+
     message = (
-        f"**Gmail Emails:**\n"
-        f"**Plus:**\n{gmail_plus}\n\n"
-        f"**Dot Variation:**\n{gmail_dot}\n\n"
-        f"**Plus Dot Combination:**\n{gmail_plus_dot}\n\n"
-        f"**Outlook Emails:**\n"
-        f"**Plus:**\n{outlook_plus}"
+        "**Gmail Emails:**\n"
+        "**Plus:**\n" + "\n".join(gmail_plus) + "\n\n"
+        "**Dot Variation:**\n" + "\n".join(gmail_dot) + "\n\n"
+        "**Plus Dot Combination:**\n" + "\n".join(gmail_plus_dot) + "\n\n"
+        "**Outlook Emails:**\n"
+        "**Plus:**\n" + "\n".join(outlook_plus)
     )
-    
+
     apobj.notify(body=message, title="Generated Emails")
 
 def main():
