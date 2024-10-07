@@ -53,7 +53,9 @@ def generate_dot_variations(username):
 
 def generate_emails(base_email, name_types, add_numbers, total_count=10, plus_count=0, dot_variation_count=0, plus_dot_combination_count=0, domain="", plus_enabled=True, dot_enabled=True, plus_dot_combination_enabled=True):
     username, domain = base_email.split('@')
-    emails = set()
+    plus_emails = set()
+    dot_emails = set()
+    plus_dot_emails = set()
 
     # Fallback to plus type if all counts are 0
     if total_count > 10 and plus_count == 0 and dot_variation_count == 0 and plus_dot_combination_count == 0:
@@ -67,14 +69,14 @@ def generate_emails(base_email, name_types, add_numbers, total_count=10, plus_co
             for var in variation:
                 if count >= plus_dot_combination_count:
                     break
-                emails.add(f"{var}+{generate_name(name_types)}@{domain}")
+                plus_dot_emails.add(f"{var}+{generate_name(name_types)}@{domain}")
                 count += 1
 
     # Generate Plus emails
     count = 0
     if plus_enabled and plus_count > 0:
         while count < plus_count:
-            emails.add(f"{username}+{generate_name(name_types)}@{domain}")
+            plus_emails.add(f"{username}+{generate_name(name_types)}@{domain}")
             count += 1
 
     # Generate Dot Variation emails
@@ -85,10 +87,12 @@ def generate_emails(base_email, name_types, add_numbers, total_count=10, plus_co
             for var in variation:
                 if count >= dot_variation_count:
                     break
-                emails.add(f"{var}@{domain}")
+                dot_emails.add(f"{var}@{domain}")
                 count += 1
 
-    return list(emails)[:total_count]
+    # Combine all emails
+    emails = list(plus_emails | dot_emails | plus_dot_emails)
+    return emails[:total_count]
 
 def write_to_file(filename, emails):
     with open(filename, 'w') as f:
