@@ -53,27 +53,42 @@ def generate_dot_variations(username):
 
 def generate_emails(base_email, name_types, add_numbers, total_count=10, plus_count=0, dot_variation_count=0, plus_dot_combination_count=0, domain="", plus_enabled=True, dot_enabled=True, plus_dot_combination_enabled=True):
     username, domain = base_email.split('@')
-    emails = []
+    emails = set()
 
     # Fallback to plus type if all counts are 0
     if total_count > 10 and plus_count == 0 and dot_variation_count == 0 and plus_dot_combination_count == 0:
         plus_count = total_count
 
-    for _ in range(plus_dot_combination_count):
-        if len(emails) < total_count and plus_dot_combination_enabled:
+    # Generate Plus Dot Combination emails
+    count = 0
+    if plus_dot_combination_enabled and plus_dot_combination_count > 0:
+        while count < plus_dot_combination_count:
             variation = generate_dot_variations(username)
-            emails.append(next(iter(variation)) + '+' + generate_name(name_types) + '@' + domain)
-    
-    for _ in range(plus_count):
-        if len(emails) < total_count and plus_enabled:
-            emails.append(username + '+' + generate_name(name_types) + '@' + domain)
-    
-    for _ in range(dot_variation_count):
-        if len(emails) < total_count and dot_enabled:
+            for var in variation:
+                if count >= plus_dot_combination_count:
+                    break
+                emails.add(f"{var}+{generate_name(name_types)}@{domain}")
+                count += 1
+
+    # Generate Plus emails
+    count = 0
+    if plus_enabled and plus_count > 0:
+        while count < plus_count:
+            emails.add(f"{username}+{generate_name(name_types)}@{domain}")
+            count += 1
+
+    # Generate Dot Variation emails
+    count = 0
+    if dot_enabled and dot_variation_count > 0:
+        while count < dot_variation_count:
             variation = generate_dot_variations(username)
-            emails.append(next(iter(variation)) + '@' + domain)
-    
-    return emails
+            for var in variation:
+                if count >= dot_variation_count:
+                    break
+                emails.add(f"{var}@{domain}")
+                count += 1
+
+    return list(emails)[:total_count]
 
 def write_to_file(filename, emails):
     with open(filename, 'w') as f:
