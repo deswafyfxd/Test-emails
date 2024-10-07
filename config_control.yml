@@ -5,7 +5,7 @@ gmail:
   plus_count: 5  # Number of Gmail emails with "+"
   dot_variation: true  # Use dot variations in Gmail email addresses
   dot_variation_count: 5  # Number of Gmail emails with dot variations
-  plus_dot_combination: false  # Use both "+" and dot variations in Gmail email addresses
+  plus_dot_combination: true  # Use both "+" and dot variations in Gmail email addresses
   plus_dot_combination_count: 5  # Number of Gmail emails with both "+" and dot variations
 
 outlook:
