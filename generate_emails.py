@@ -94,7 +94,22 @@ def write_to_file(filename, emails):
 def send_to_discord(gmail_emails, outlook_emails, webhook_url):
     apobj = apprise.Apprise()
     apobj.add(webhook_url)
-    message = "**Gmail Emails:**\n" + "\n".join(gmail_emails) + "\n\n**Outlook Emails:**\n" + "\n".join(outlook_emails)
+    
+    gmail_plus = "\n".join([email for email in gmail_emails if "+" in email and "." not in email])
+    gmail_dot = "\n".join([email for email in gmail_emails if "." in email and "+" not in email])
+    gmail_plus_dot = "\n".join([email for email in gmail_emails if "+" in email and "." in email])
+    
+    outlook_plus = "\n".join([email for email in outlook_emails if "+" in email])
+    
+    message = (
+        f"**Gmail Emails:**\n"
+        f"**Plus:**\n{gmail_plus}\n\n"
+        f"**Dot Variation:**\n{gmail_dot}\n\n"
+        f"**Plus Dot Combination:**\n{gmail_plus_dot}\n\n"
+        f"**Outlook Emails:**\n"
+        f"**Plus:**\n{outlook_plus}"
+    )
+    
     apobj.notify(body=message, title="Generated Emails")
 
 def main():
