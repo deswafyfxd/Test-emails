@@ -46,14 +46,12 @@ def generate_name(name_types):
     return fake.first_name().lower()  # Default to personal names if all false
 
 def generate_dot_variations(username):
-    positions = range(len(username) - 1)
+    positions = range(len(username))
     variations = set()
-    
+
     for i in positions:
-        for j in positions:
-            if i < j:
-                variation = username[:i+1] + '.' + username[i+1:j+1] + '.' + username[j+1:]
-                variations.add(variation)
+        variation = username[:i] + '.' + username[i:]
+        variations.add(variation)
     return variations
 
 def generate_emails(base_email, name_types, add_numbers, total_count=10, plus_count=0, dot_variation_count=0, plus_dot_combination_count=0, domain="", plus_enabled=True, dot_enabled=True, plus_dot_combination_enabled=True):
