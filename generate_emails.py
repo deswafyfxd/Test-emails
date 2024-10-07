@@ -4,6 +4,7 @@ import os
 import yaml
 from faker import Faker
 import apprise
+from datetime import datetime
 
 fake = Faker()
 
@@ -103,6 +104,8 @@ def send_to_discord(gmail_emails, outlook_emails, webhook_url):
     apobj = apprise.Apprise()
     apobj.add(webhook_url)
 
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     gmail_plus = [email for email in gmail_emails if "+" in email and "." not in email]
     gmail_dot = [email for email in gmail_emails if "." in email and "+" not in email]
     gmail_plus_dot = [email for email in gmail_emails if "+" in email and "." in email]
@@ -110,6 +113,7 @@ def send_to_discord(gmail_emails, outlook_emails, webhook_url):
     outlook_plus = [email for email in outlook_emails if "+" in email]
 
     message = (
+        f"**Date and Time:** {timestamp}\n\n"
         "**Gmail Emails:**\n"
         "**Plus:**\n" + "\n".join(gmail_plus) + "\n\n"
         "**Dot Variation:**\n" + "\n".join(gmail_dot) + "\n\n"
