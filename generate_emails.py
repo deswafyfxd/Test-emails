@@ -92,7 +92,7 @@ def generate_emails(base_email, name_types, add_numbers, total_count=10, plus_co
                 count += 1
 
     # Combine all emails
-    emails = list(plus_emails | dot_emails | plus_dot_emails)
+    emails = list(plus_emails) + list(dot_emails) + list(plus_dot_emails)
     return emails[:total_count]
 
 def write_to_file(filename, emails):
