@@ -1,6 +1,6 @@
 gmail:
   enabled: true  # Enable or disable Gmail email generation
-  count: 15  # Total number of Gmail emails to generate
+  count: 20  # Total number of Gmail emails to generate
   plus: true  # Use "+" in Gmail email addresses
   plus_count: 5  # Number of Gmail emails with "+"
   dot_variation: true  # Use dot variations in Gmail email addresses
