@@ -58,40 +58,27 @@ def generate_emails(base_email, name_types, add_numbers, total_count=10, plus_co
     dot_emails = set()
     plus_dot_emails = set()
 
-    # Fallback to plus type if all counts are 0
-    if total_count > 10 and plus_count == 0 and dot_variation_count == 0 and plus_dot_combination_count == 0:
+    if total_count <= 10:
         plus_count = total_count
 
-    # Generate Plus Dot Combination emails
-    count = 0
-    if plus_dot_combination_enabled and plus_dot_combination_count > 0:
-        while count < plus_dot_combination_count:
-            variation = generate_dot_variations(username)
-            for var in variation:
-                if count >= plus_dot_combination_count:
-                    break
-                plus_dot_emails.add(f"{var}+{generate_name(name_types)}@{domain}")
-                count += 1
-
-    # Generate Plus emails
-    count = 0
-    if plus_enabled and plus_count > 0:
-        while count < plus_count:
+    if plus_enabled:
+        for _ in range(plus_count):
             plus_emails.add(f"{username}+{generate_name(name_types)}@{domain}")
-            count += 1
 
-    # Generate Dot Variation emails
-    count = 0
-    if dot_enabled and dot_variation_count > 0:
-        while count < dot_variation_count:
-            variation = generate_dot_variations(username)
-            for var in variation:
-                if count >= dot_variation_count:
-                    break
-                dot_emails.add(f"{var}@{domain}")
-                count += 1
+    if dot_enabled:
+        variations = generate_dot_variations(username)
+        for i, var in enumerate(variations):
+            if i >= dot_variation_count:
+                break
+            dot_emails.add(f"{var}@{domain}")
 
-    # Combine all emails
+    if plus_dot_combination_enabled:
+        variations = generate_dot_variations(username)
+        for i, var in enumerate(variations):
+            if i >= plus_dot_combination_count:
+                break
+            plus_dot_emails.add(f"{var}+{generate_name(name_types)}@{domain}")
+
     emails = list(plus_emails) + list(dot_emails) + list(plus_dot_emails)
     return emails[:total_count]
 
@@ -150,7 +137,6 @@ def main():
     outlook_dot_variation_enabled = control_config['outlook'].get('dot_variation', False)
     outlook_plus_dot_combination_enabled = control_config['outlook'].get('plus_dot_combination', False)
 
-    # Default to plus if total count is 10 or below
     if gmail_total_count <= 10:
         gmail_plus_count = gmail_total_count
         gmail_dot_variation_count = 0
